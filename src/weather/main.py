@@ -31,14 +31,29 @@ if __name__ == "__main__":
 
     # Get weather data. It is returned as a list of one dict.
     # This format is required by influx db.
-    data = weather_data(city=args.city, key=args.api_key, unit=unit)
+    payload, forecasts = weather_data(city=args.city, key=args.api_key, unit=unit)
 
     # Create db client and write data.
     try:
-        client = InfluxDBClient(host=args.host, port=args.port, username=args.username,
-                                password=args.password, database=args.database)
-        client.write_points(data)
-        print(f"{now} - Add data to {args.database} DB")
+        client = InfluxDBClient(host=args.host, port=args.port, username=args.username,password=args.password, database=args.database)
+
+        for forecast in forecasts:
+            day = forecast['day']
+            epoch = forecast['date']
+            low = round(float(forecast['low']))
+            high = round(float(forecast['high']))
+            condition = forecast['text']
+
+            payload[0]["time"] = epoch
+            payload[0]["fields"]["day"] = day
+            payload[0]["fields"]["low"] = low
+            payload[0]["fields"]["high"] = high
+            payload[0]["fields"]["condition"] = condition
+
+            client.write_points(payload)
+
+        print(f"{now} - Payload data inserted to {args.database} DB.")
         client.close()
+
     except (ex.InfluxDBClientError, ex.InfluxDBServerError) as e:
         print(f"{now} - Failed to send metrics to influxdb {e}")

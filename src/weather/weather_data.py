@@ -3,12 +3,15 @@ import requests
 
 
 def weather_data(city, key, unit=False):
-    payload = [{
+    # a metadata like for forecasts
+    metadata = [{
         "measurement": "weather",
         "time": "",
         "tags": {},
         "fields": {},
     }]
+    # list of dicts for 10 days forecasts
+    forecasts = []
 
     url = "https://yahoo-weather5.p.rapidapi.com/weather"
     querystring = {"location": city, "format": "json", "u": unit}
@@ -19,7 +22,7 @@ def weather_data(city, key, unit=False):
 
     try:
         response = requests.request("GET", url, headers=headers, params=querystring)
-        # return weather data as a dict (json).
+        # convert weather data to a dict (json).
         resp = response.json()
 
         if resp is not None:
@@ -31,9 +34,9 @@ def weather_data(city, key, unit=False):
                         region = v['region']
                         timezone = v['timezone_id']
 
-                        payload[0]["tags"]["city"] = city
-                        payload[0]["tags"]["region"] = region
-                        payload[0]["tags"]["timezone_id"] = timezone
+                        metadata[0]["tags"]["city"] = city
+                        metadata[0]["tags"]["region"] = region
+                        metadata[0]["tags"]["timezone_id"] = timezone
                 # fields ################
                 if k == "current_observation":
                     for i in v:
@@ -41,27 +44,19 @@ def weather_data(city, key, unit=False):
                         sunrise = v['astronomy']['sunrise']
                         sunset = v['astronomy']['sunset']
 
-                        payload[0]["fields"]["wind_speed"] = wind_speed
-                        payload[0]["fields"]["sunrise"] = sunrise
-                        payload[0]["fields"]["sunset"] = sunset
-                # fields + time ################
+                        metadata[0]["fields"]["wind_speed"] = wind_speed
+                        metadata[0]["fields"]["sunrise"] = sunrise
+                        metadata[0]["fields"]["sunset"] = sunset
+
+            # assemble weather forecasts
+            for k, v in resp.items():
                 if k == "forecasts":
                     for i in v:
-                        day = i['day']
-                        epoch = i['date']
-                        low = round(float(i['low']))
-                        high = round(float(i['high']))
-                        condition = i['text']
-
-                        payload[0]["time"] = epoch
-                        payload[0]["fields"]["day"] = day
-                        payload[0]["fields"]["low"] = low
-                        payload[0]["fields"]["high"] = high
-                        payload[0]["fields"]["condition"] = condition
+                        forecasts.append(i)
 
     except (requests.exceptions.HTTPError,
             requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout) as e:
         print(f"API Connectivity Error: {e}")
 
-    return payload
+    return metadata, forecasts
