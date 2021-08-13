@@ -1,6 +1,6 @@
 # influx db
 
-Developing basic applications to generate time-series data and ingest it into influx db. Then generate Grafana dashboards from influx db tables (measurements).
+Developing basic applications to generate time-series data, ingest it into influx db, then build Grafana dashboards from influx db tables (measurements).
 
 ---
 
