@@ -32,3 +32,20 @@ config.vm.network "forwarded_port", guest: 8086, host: 8086
 
 Influxdb Api reference
 https://archive.docs.influxdata.com/influxdb/v1.2/tools/api/
+
+DB init:
+```buildoutcfg
+def init(db_name, db_client):
+    """Initialization: create a database only if it doesn't exist"""
+    dbs = db_client.get_list_database()
+    databases = {k for d in dbs for k in d.values()}
+    if db_name not in databases:
+        db_client.create_database(db_name)
+        print(f"DB {db_name} created successfully.")
+    else:
+        print(f"DB already exist.")
+```
+
+Jobs scheduling
+https://github.com/dbader/schedule
+https://github.com/taichino/croniter
