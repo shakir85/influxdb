@@ -1,14 +1,15 @@
 #!/bin/python3
+import logging
+
+from os import environ
 from datetime import datetime
 from src.weather.weather_data import weather_data
 from influxdb import InfluxDBClient, exceptions as ex
 from argparse import ArgumentParser
 
-# TODO add logging (replace print statements).
+# TODO: Enhance logging -> add debug mode logs.
 
 if __name__ == "__main__":
-
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     parser = ArgumentParser()
     parser.add_argument('-s', "--host",
@@ -22,6 +23,12 @@ if __name__ == "__main__":
     parser.add_argument('-n', "--unit", type=str, required=False,
                         help="Temperature units. 'f' for Fahrenheit or 'c' for Celsius, default is 'c' - (optional).")
     args = parser.parse_args()
+
+    # Will keep the debug level at DEBUG for now. Since this script is going to execute at 10 days
+    # intervals, no need to worry about having large log files.
+    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Default temperature unit
     unit = "c"
@@ -52,8 +59,10 @@ if __name__ == "__main__":
 
             client.write_points(payload)
 
-        print(f"{now} - Payload data inserted to {args.database} DB.")
+        logging.info(f"Payload data inserted to {args.database} DB.")
         client.close()
 
     except (ex.InfluxDBClientError, ex.InfluxDBServerError) as e:
-        print(f"{now} - Failed to send metrics to influxdb {e}")
+        logging.critical(f"Influxdb server side error: \n{e}")
+    except Exception as j:
+        logging.critical(f"Failed to establish a db connection: \n{j}")
