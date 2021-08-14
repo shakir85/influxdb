@@ -1,9 +1,7 @@
 #!/bin/python3
 import logging
-
-from os import environ
+import weather_data
 from datetime import datetime
-from src.weather.weather_data import weather_data
 from influxdb import InfluxDBClient, exceptions as ex
 from argparse import ArgumentParser
 
@@ -36,9 +34,9 @@ if __name__ == "__main__":
     if args.unit:
         unit = args.unit
 
-    # Get weather data. It is returned as a list of one dict.
+    # Get weather data. It is returned as a list ilwaukee&format=json&u=c HTTP/1.1" 200 1350of one dict.
     # This format is required by influx db.
-    payload, forecasts = weather_data(city=args.city, key=args.api_key, unit=unit)
+    payload, forecasts = weather_data.weather_data(city=args.city, key=args.api_key, unit=unit)
 
     # Create db client and write data.
     try:
