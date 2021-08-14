@@ -10,4 +10,8 @@ FROM python.3.8-buster
 
 ## USER $user
 
+## EXPOSE bind ports with localhost
+
+## ENV PYTHONPATH=/weather/app
+
 ## CMD starter
