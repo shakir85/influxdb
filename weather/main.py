@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     time.sleep(5)
 
-    schedule.every(2).minutes.do(main, username=args.username, password=args.password, api_key=args.api_key)
-    # schedule.every().day.at("6:00").do(main, username=args.username, password=args.password, api_key=args.api_key)
+    # schedule.every(2).minutes.do(main, username=args.username, password=args.password, api_key=args.api_key)
+    schedule.every().day.at("6:00").do(main, username=args.username, password=args.password, api_key=args.api_key)
     while True:
         schedule.run_pending()
