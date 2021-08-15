@@ -27,9 +27,16 @@ services:
     depends_on:
       - db
 
+  grafana:
+    build: grafana/grafana:8.1.1
+    network_mode: host
+#    ports:
+#    - "3000:3000"
+
+
   db:
     build: influxdb
-    image: influxdb:main
+    image: influxdb:1.8.9
     container_name: influxdb
     restart: always
     # TODO: Change to false before deployment
