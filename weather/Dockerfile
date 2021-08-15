@@ -1,6 +1,6 @@
 FROM python:3.8-buster
 
-RUN mkdir -p /weather/conf && mkdir /weather/app
+RUN mkdir -p /weather/app && mkdir /weather/log
 
 ENV APP_USER    appuser
 ENV APP_GROUP   appgroup
@@ -12,7 +12,7 @@ RUN apt-get update && \
 
 RUN groupadd -g 9999 ${APP_GROUP} &&  useradd -g 9999 -d /weather -s /bin/bash ${APP_USER}
 
-COPY utilities/ /weather/conf
+COPY db_init.py /weather/app
 COPY weather_data.py /weather/app
 COPY main.py /weather/app
 COPY requirements.txt /weather
@@ -29,5 +29,4 @@ ENV PYTHONPATH=/weather
 
 EXPOSE 8086
 
-#CMD echo "" && sleep 3600
-CMD python app/main.py -u -p -k
+CMD python /weather/app/main.py -u  -p  -k

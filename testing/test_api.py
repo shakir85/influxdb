@@ -1,12 +1,9 @@
 #!/bin/python3
-import json
-from src.weather.weather_data import weather_data
 """
 test api
 """
 
 import schedule
-import time
 
 """
 Script to run at container startup to schedule main.py execution time.

@@ -5,7 +5,7 @@ volumes:
 
 services:
   weather_mke:
-    build: ./src/weather
+    build: weather
     image: weather_mke:0.0.1
     container_name: weather_app
     restart: always
@@ -28,7 +28,7 @@ services:
       - db
 
   db:
-    build: ./src/influxdb
+    build: influxdb
     image: influxdb:main
     container_name: influxdb
     restart: always

@@ -1,8 +1,10 @@
 #!/bin/python3
 import os
 import logging
+import time
 import schedule
 import weather_data
+import db_init
 from datetime import datetime
 from influxdb import InfluxDBClient, exceptions as ex
 from argparse import ArgumentParser
@@ -18,9 +20,9 @@ def main(username, password, api_key):
     PROD_DB_NAME = os.getenv('PROD_DB_NAME')
     TESTING_DB_NAME = os.getenv('TESTING_DB_NAME')
 
-    # Will keep the debug level at DEBUG for now. Since this script is going to execute at 10 days
-    # intervals, no need to worry about having large log files.
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        filename="/weather/log/main.log", filemode="a")
 
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -65,7 +67,12 @@ if __name__ == "__main__":
     parser.add_argument('-k', "--api-key", type=str, required=True, help="API key - (required).")
 
     args = parser.parse_args()
-    schedule.every(10).minutes.do(main, username=args.username, password=args.password, api_key=args.api_key)
+
+    db_init.init(username=args.username, password=args.password)
+
+    time.sleep(5)
+
+    schedule.every(2).minutes.do(main, username=args.username, password=args.password, api_key=args.api_key)
     # schedule.every().day.at("6:00").do(main, username=args.username, password=args.password, api_key=args.api_key)
     while True:
         schedule.run_pending()
