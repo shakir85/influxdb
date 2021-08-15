@@ -1,4 +1,5 @@
 #!/bin/python3
+import os
 import logging
 import weather_data
 from datetime import datetime
@@ -10,17 +11,23 @@ from argparse import ArgumentParser
 if __name__ == "__main__":
 
     parser = ArgumentParser()
-    parser.add_argument('-s', "--host",
-                        type=str, required=True, help="Database IP or hostname (default is localhost) - (required).")
-    parser.add_argument('-t', "--port", type=int, required=True, help="Database port (default is 8086) - (required).")
+    # parser.add_argument('-s', "--host", type=str, required=True, help="Database IP or hostname (default is localhost) - (required).")
+    # parser.add_argument('-t', "--port", type=int, required=True, help="Database port (default is 8086) - (required).")
+    # parser.add_argument('-c', "--city", type=str, required=True, help="City to get weather for - (required).")
+    # parser.add_argument('-d', "--database", type=str, required=True, help="Target database - (required).")
     parser.add_argument('-u', "--username", type=str, required=True, help="Database username - (required).")
     parser.add_argument('-p', "--password", type=str, required=True, help="Database password - (required).")
-    parser.add_argument('-d', "--database", type=str, required=True, help="Target database - (required).")
-    parser.add_argument('-c', "--city", type=str, required=True, help="City to get weather for - (required).")
     parser.add_argument('-k', "--api-key", type=str, required=True, help="API key - (required).")
     parser.add_argument('-n', "--unit", type=str, required=False,
                         help="Temperature units. 'f' for Fahrenheit or 'c' for Celsius, default is 'c' - (optional).")
     args = parser.parse_args()
+
+    # Environment variables should be exported via compose file.
+    DB_HOST = os.getenv('DB_IP_ADDRESS')
+    DB_PORT = os.getenv('DB_API_PORT')
+    CITY = os.getenv('CITY')
+    PROD_DB_NAME = os.getenv('PROD_DB_NAME')
+    TESTING_DB_NAME = os.getenv('TESTING_DB_NAME')
 
     # Will keep the debug level at DEBUG for now. Since this script is going to execute at 10 days
     # intervals, no need to worry about having large log files.
@@ -36,11 +43,11 @@ if __name__ == "__main__":
 
     # Get weather data. It is returned as a list ilwaukee&format=json&u=c HTTP/1.1" 200 1350of one dict.
     # This format is required by influx db.
-    payload, forecasts = weather_data.weather_data(city=args.city, key=args.api_key, unit=unit)
+    payload, forecasts = weather_data.weather_data(city=CITY, key=args.api_key, unit=unit)
 
     # Create db client and write data.
     try:
-        client = InfluxDBClient(host=args.host, port=args.port, username=args.username,password=args.password, database=args.database)
+        client = InfluxDBClient(host=DB_HOST, port=DB_PORT, username=args.username,password=args.password, database=TESTING_DB_NAME)
 
         for forecast in forecasts:
             day = forecast['day']
@@ -57,7 +64,7 @@ if __name__ == "__main__":
 
             client.write_points(payload)
 
-        logging.info(f"Payload data inserted to {args.database} DB.")
+        logging.info(f"Payload data inserted to {DB_HOST} DB.")
         client.close()
 
     except (ex.InfluxDBClientError, ex.InfluxDBServerError) as e:

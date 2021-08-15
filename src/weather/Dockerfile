@@ -41,4 +41,5 @@ ENV PYTHONPATH=/weather
 ## EXPOSE bind ports with localhost
 EXPOSE 8086
 
+CMD echo "" && sleep 3600
 ## CMD starter

@@ -1,23 +1,27 @@
-version: "2"
+version: "3.7"
 
 volumes:
-  db_persist:
+  db_volume:
 
 services:
-  weather_app:
+  weather_app_1:
     build: ./src/weather
     restart: always
-    # TODO: Change to false before deployment
+    # TODO: Change to 'false' before deployment
     privileged: true
     network_mode: host
     environment:
+      CITY: milwaukee
       DB_IP_ADDRESS: 0.0.0.0
       DB_API_PORT: 8086
       TESTING_DB_NAME: example
       TESTING_DB_USER: default
-    ports:
-    - 8086:8086
-
+      PROD_DB_NAME: weather
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     depends_on:
       - db
 
@@ -27,8 +31,8 @@ services:
     # TODO: Change to false before deployment
     privileged: true
     network_mode: host
-    ports:
-    - 8086:8086
+#    ports:
+#    - "8086:8086"
     volumes:
-    - db_persist:/var/lib/influxdb
+    - db_volume:/var/lib/influxdb25
 
