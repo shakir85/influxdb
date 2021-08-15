@@ -6,7 +6,6 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y -q --no-install-recommends \
         curl \
-        git \
         htop \
         vim \
     && rm -rf /var/lib/apt/lists/*
@@ -26,7 +25,6 @@ RUN chmod -R 750 /weather
 
 USER $RUN_USER
 
-## COPY scripts
 COPY startup.py /weather/conf
 COPY weather_data.py /weather/app
 COPY main.py /weather/app
@@ -38,8 +36,7 @@ RUN pip3 install -r requirements.txt virtualenv
 
 ENV PYTHONPATH=/weather
 
-## EXPOSE bind ports with localhost
 EXPOSE 8086
 
-CMD echo "" && sleep 3600
-## CMD starter
+#CMD echo "" && sleep 3600
+CMD ["/weather/app/main.py", "-u root", "-p root", "-k a825cc216cmshc5195bbf0afb97ep1a0afejsne4986faee612"]
