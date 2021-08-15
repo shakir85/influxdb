@@ -39,4 +39,4 @@ ENV PYTHONPATH=/weather
 EXPOSE 8086
 
 #CMD echo "" && sleep 3600
-CMD ["/weather/app/main.py", "-u root", "-p root", "-k a825cc216cmshc5195bbf0afb97ep1a0afejsne4986faee612"]
+CMD ["/weather/app/main.py", "-u root", "-p root", "-k"]
