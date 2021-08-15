@@ -1,17 +1,45 @@
-FROM python.3.8-buster
+FROM python:3.8-buster
 
 ## RUN apt installs
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y -q --no-install-recommends \
+        curl \
+        git \
+        htop \
+        vim \
+    && rm -rf /var/lib/apt/lists/*
 
 ## RUN mkdirs
+RUN mkdir -p /weather/conf \
+    && mkdir /weather/app
 
-## RUN useradd & groupadd chmod and chown -R execution directories
+ENV APP_USER    appuser
+ENV APP_GROUP   appgroup
+
+RUN groupadd -g 1111 ${APP_GROUP} && \
+    useradd -g 1111 -d /weather -s /bin/bash ${APP_USER}
+
+RUN chown -R $APP_USER:$APP_GROUP /weather
+RUN chmod -R 750 /weather
+
+USER $RUN_USER
 
 ## COPY scripts
+COPY startup.py /weather/conf
+COPY weather_data.py /weather/app
+COPY main.py /weather/app
+COPY requirements.txt /weather
 
-## USER $user
+WORKDIR /weather
+
+RUN pip3 install -r requirements.txt virtualenv
+
+ENV PYTHONPATH=/weather
 
 ## EXPOSE bind ports with localhost
+EXPOSE 8086
 
-## ENV PYTHONPATH=/weather/app
-
+CMD echo "" && sleep 3600
 ## CMD starter
