@@ -28,8 +28,12 @@ services:
       - db
 
   grafana:
-    build: grafana/grafana:8.1.1
+    # grafana default user & pass = admin
+    image: grafana/grafana:6.5.0
     network_mode: host
+    depends_on:
+      - weather_mke
+      - db
 #    ports:
 #    - "3000:3000"
 
