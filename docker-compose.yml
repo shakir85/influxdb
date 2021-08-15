@@ -4,8 +4,10 @@ volumes:
   db_volume:
 
 services:
-  weather_app_1:
+  weather_mke:
     build: ./src/weather
+    image: weather_mke:0.0.1
+    container_name: weather_app
     restart: always
     # TODO: Change to 'false' before deployment
     privileged: true
@@ -27,6 +29,8 @@ services:
 
   db:
     build: ./src/influxdb
+    image: influxdb:main
+    container_name: influxdb
     restart: always
     # TODO: Change to false before deployment
     privileged: true
