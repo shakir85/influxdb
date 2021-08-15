@@ -1,16 +1,18 @@
-FROM python:3.8-buster
+FROM python:alpine3.13
 
 RUN mkdir -p /weather/app && mkdir /weather/log
 
 ENV APP_USER    appuser
 ENV APP_GROUP   appgroup
 
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y -q --no-install-recommends curl htop vim && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add curl htop vim
 
-RUN groupadd -g 9999 ${APP_GROUP} &&  useradd -g 9999 -d /weather -s /bin/bash ${APP_USER}
+# -g is the GID
+RUN addgroup -g 33445 ${APP_GROUP}
+
+# -u is the UID
+# -D permits to create an user without password
+RUN adduser -u 11223 -G ${APP_GROUP} -h /weather -D ${APP_USER}
 
 COPY db_init.py /weather/app
 COPY weather_data.py /weather/app
