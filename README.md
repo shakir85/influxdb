@@ -1,13 +1,7 @@
 # influx db
-*(in progress...)*
-Developing basic applications to generate time-series data, ingest it into influx db, then build Grafana dashboards from influx db tables (measurements).
 
----
 
-## Usage
-Stuff I need frequently during development...
-
-Test port binding with vagrant developent box
+Test port binding with dev vagrant box
 `curl -G http://localhost:8086/query --data-urlencode "q=SHOW DATABASES" | jq`
 
 Ping db:
