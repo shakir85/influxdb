@@ -11,7 +11,6 @@ services:
     restart: always
     # TODO: Change to 'false' before deployment
     privileged: true
-    network_mode: host
     environment:
       CITY: milwaukee
       DB_IP_ADDRESS: 0.0.0.0
@@ -30,12 +29,12 @@ services:
   grafana:
     # grafana default user & pass = admin
     image: grafana/grafana:6.5.0
-    network_mode: host
+
     depends_on:
       - weather_mke
       - db
-#    ports:
-#    - "3000:3000"
+     ports:
+       - "3000:3000"
 
 
   db:
@@ -45,9 +44,9 @@ services:
     restart: always
     # TODO: Change to false before deployment
     privileged: true
-    network_mode: host
-#    ports:
-#    - "8086:8086"
+
+    ports:
+      - "8086:8086"
     volumes:
-    - db_volume:/var/lib/influxdb25
+      - db_volume:/var/lib/influxdb25
 
