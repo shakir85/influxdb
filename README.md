@@ -43,3 +43,6 @@ def init(db_name, db_client):
 Jobs scheduling
 https://github.com/dbader/schedule
 https://github.com/taichino/croniter
+
+## Todo
+Send metrics from Logsatsh to influxdb
