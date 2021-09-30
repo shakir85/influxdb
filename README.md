@@ -45,4 +45,4 @@ https://github.com/dbader/schedule
 https://github.com/taichino/croniter
 
 ## Todo
-Send metrics from Logsatsh to influxdb
+Send metrics from Logsatsh's input using Twitter stream API to influxdb
