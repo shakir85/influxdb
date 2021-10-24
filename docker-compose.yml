@@ -1,7 +1,7 @@
 version: "3.7"
 
 volumes:
-  db_volume:
+  influxdb:
 
 services:
   weather_mke:
@@ -9,8 +9,6 @@ services:
     image: weather_mke:0.0.1
     container_name: weather_app
     restart: always
-    # TODO: Change to 'false' before deployment
-    privileged: true
     environment:
       CITY: milwaukee
       DB_IP_ADDRESS: 0.0.0.0
@@ -42,11 +40,8 @@ services:
     image: influxdb:1.8.9
     container_name: influxdb
     restart: always
-    # TODO: Change to false before deployment
-    privileged: true
-
     ports:
       - "8086:8086"
     volumes:
-      - db_volume:/var/lib/influxdb25
+      - influxdb:/var/lib/influxdb25
 

@@ -4,7 +4,7 @@ import logging
 from influxdb import InfluxDBClient, exceptions as ex
 """
 Script to initialize 'weather' database:
-- pings the connection to influx db container.
+- pings the influx db container to ensure that we're able to connect to the DB.
 - creates weather db if it doesn't exist.
 """
 
@@ -13,18 +13,26 @@ def init(username, password):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         filename="/weather/log/db_init.log", filemode="a")
-
+    # These environment variable exported in the Docker container
     DB_HOST = os.getenv('DB_IP_ADDRESS')
     DB_PORT = os.getenv('DB_API_PORT')
     # PROD_DB_NAME = os.getenv('PROD_DB_NAME')
     TESTING_DB_NAME = os.getenv('TESTING_DB_NAME')
 
     try:
+        # InfluxDB client
         client = InfluxDBClient(host=DB_HOST, port=DB_PORT, username=username, password=password, database=TESTING_DB_NAME)
 
+        # Test DB connection
         version = client.ping()
-        logging.info("Successfully connected to InfluxDB: " + version)
+        if version is not None:
+            logging.info("Successfully connected to InfluxDB: " + version)
+        else:
+            logging.critical(f"Unable to hear back form DB, is influxDB container running?")
+            # I should do something better than throwing a generic exception to stop the execution
+            raise Exception
 
+        # See if the db exists, if not -> a create one...
         dbs = client.get_list_database()
         databases = {k for d in dbs for k in d.values()}
         if TESTING_DB_NAME not in databases:
